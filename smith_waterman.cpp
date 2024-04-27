@@ -6,7 +6,7 @@ struct point{
     int x,y;
 };
 
-string s1="AGTCTTGACCTCAGGAGAT", s2="CTTGACCTCAGGAGATGG";
+string s1="HEAGAWGHEE", s2="PAWHEAE";
 
 int score[20][20],high_score=0;
 
@@ -16,6 +16,7 @@ vector<point> seq_end;
 
 vector<string> ansA,ansB;
 
+//回朔取得最佳序列
 void dfs(int x,int y,string ans1,string ans2){
     if(score[x][y]==0){
         reverse(ans1.begin(),ans1.end());
@@ -32,38 +33,40 @@ void dfs(int x,int y,string ans1,string ans2){
 
 int main()
 {
+    //Smith Waterman Algorithm
     for(int i=1;i<=s1.length();i++){
         for(int j=1;j<=s2.length();j++){
             if(s1[i-1]==s2[j-1]){
                 if(score[i-1][j-1]+2>=score[i][j-1]-2 && score[i-1][j-1]+2>=score[i-1][j]-2){
                     score[i][j]=score[i-1][j-1]+2;
-                    trace[i][j][0]=1;
-                    if(score[i][j-1]-2==score[i-1][j-1]+2)trace[i][j][2]=1;
-                    if(score[i-1][j]-2==score[i-1][j-1]+2)trace[i][j][1]=1;
+                    trace[i][j][0]=1;   //match
+                    if(score[i][j-1]-2==score[i-1][j-1]+2)trace[i][j][2]=1; //gap
+                    if(score[i-1][j]-2==score[i-1][j-1]+2)trace[i][j][1]=1; //gap
                 }else if(score[i-1][j]>=score[i][j-1]){
                     score[i][j]=score[i-1][j]-2;
-                    trace[i][j][1]=1;
-                    if(score[i-1][j]==score[i][j-1])trace[i][j][2]=1;
+                    trace[i][j][1]=1;   //gap
+                    if(score[i-1][j]==score[i][j-1])trace[i][j][2]=1;   //gap
                 }else{
                     score[i][j]=score[i][j-1]-2;
-                    trace[i][j][2]=1;
+                    trace[i][j][2]=1;   //gap
                 }
             }
             else{
                 if(score[i-1][j-1]-1>=score[i][j-1]-2 && score[i-1][j-1]-1>=score[i-1][j]-2 && score[i-1][j-1]-1>0){
                     score[i][j]=score[i-1][j-1]-1;
-                    trace[i][j][0]=1;
-                    if(score[i][j-1]-2==score[i-1][j-1]-1)trace[i][j][2]=1;
-                    if(score[i-1][j]-2==score[i-1][j-1]-1)trace[i][j][1]=1;
+                    trace[i][j][0]=1;   //mismatch
+                    if(score[i][j-1]-2==score[i-1][j-1]-1)trace[i][j][2]=1; //gap
+                    if(score[i-1][j]-2==score[i-1][j-1]-1)trace[i][j][1]=1; //gap
                 }else if(score[i-1][j]>=score[i][j-1] && score[i-1][j]-2>0){
                     score[i][j]=score[i-1][j]-2;
-                    trace[i][j][1]=1;
-                    if(score[i-1][j]==score[i][j-1])trace[i][j][2]=1;
+                    trace[i][j][1]=1;   //gap
+                    if(score[i-1][j]==score[i][j-1])trace[i][j][2]=1;   //gap
                 }else if(score[i][j-1]-2>0){
                     score[i][j]=score[i][j-1]-2;
-                    trace[i][j][2]=1;
+                    trace[i][j][2]=1;   //gap
                 }
             }
+            //當前最佳序列的尾端index
             if(score[i][j]>high_score){
                 high_score=score[i][j];
                 seq_end.clear();
@@ -75,6 +78,7 @@ int main()
         int x=seq_end[i].x,y=seq_end[i].y;
         dfs(x,y,"","");
     }
+    //顯示表格及回朔
     cout<<"         ";
     for(int i=0;i<s1.length();i++)cout<<s1[i]<<"   ";
     cout<<"\n\n";
@@ -100,6 +104,7 @@ int main()
         cout<<"\n";
     }
     cout<<"\n\n";
+    //輸出最佳序列
     for(int i=0;i<ansA.size();i++)
         cout<<i+1<<": "<<ansA[i]<<' '<<ansB[i]<<'\n';
     return 0;
